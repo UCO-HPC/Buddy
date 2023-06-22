@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.postgres.name }}-deployment
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: {{ .Release.Name }}
+      tier: database
+  template:
+    metadata:
+      name: {{ .Values.postgres.name }}
+      labels:
+        app: {{ .Release.Name }}
+        tier: database
+    spec:
+      volumes:
+      - name: {{ .Values.postgres.name }}-pv
+        persistentVolumeClaim:
+          claimName: {{ .Values.postgres.name }}-pvc
+      containers:
+      - name: {{ .Values.postgres.name }}
+        image: {{ .Values.postgres.image }}
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: "db-user"
+              key: "username"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "db-user-pass"
+              key: "password"
+        - name: POSTGRES_DATABASE
+          value: "foreman_production"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+        ports:
+        - containerPort: {{ .Values.postgres.port }}
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: {{ .Values.postgres.name }}-pv

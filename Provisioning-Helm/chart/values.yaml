@@ -1,0 +1,17 @@
+redis:
+  port: 6379
+  name: redis
+  storageSize: 1Gi
+  image: redis
+  labels:
+    tier: cache
+
+postgres:
+  port: 5432
+  name: postgress
+  image: postgres:12
+  storageSize: 1Gi
+  db_name: foreman
+  db_username: foreman
+  labels:
+    tier: database
