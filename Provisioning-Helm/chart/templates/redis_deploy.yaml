@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.redis.name }}-deployment
+  name: {{ .Values.redis.name }}
   namespace: {{ .Release.Namespace }}
   labels:
     app: {{ .Release.Name }}
@@ -19,9 +19,9 @@ spec:
         tier: cache
     spec:
       volumes:
-      - name: {{ .Values.redis.name }}-pv
+      - name: {{ .Values.redis.name }}
         persistentVolumeClaim:
-          claimName: {{ .Values.redis.name }}-pvc
+          claimName: {{ .Values.redis.name }}
       containers:
       - name: {{ .Values.redis.name }}
         image: {{ .Values.redis.image }}
@@ -29,4 +29,4 @@ spec:
         - containerPort: {{ .Values.redis.port }}
         volumeMounts:
         - mountPath: "/data"
-          name: {{ .Values.redis.name }}-pv
+          name: {{ .Values.redis.name }}

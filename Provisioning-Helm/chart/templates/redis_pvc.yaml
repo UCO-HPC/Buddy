@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ .Values.redis.name }}-pvc
+  name: {{ .Values.redis.name }}
   namespace: {{ .Release.Namespace }}
   labels:
     app: {{ .Release.Name }}

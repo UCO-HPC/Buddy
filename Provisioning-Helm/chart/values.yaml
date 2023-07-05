@@ -8,10 +8,27 @@ redis:
 
 postgres:
   port: 5432
-  name: postgress
+  name: postgres
   image: postgres:12
   storageSize: 1Gi
   db_name: foreman
   db_username: foreman
   labels:
     tier: database
+
+app:
+  port: 3000
+  image: quay.io/foreman/foreman:develop
+  name: foreman
+  labels:
+    tier: app
+
+fqdn: foreman.example.com
+
+expose:
+  type: nodePort
+  nodePort:
+    name: foreman
+    ports:
+      http:
+        nodePort: 30345
