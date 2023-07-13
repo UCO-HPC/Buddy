@@ -18,11 +18,19 @@ postgres:
 
 app:
   port: 3000
+  rails_max_threads: 5
   image: quay.io/foreman/foreman:develop
   name: foreman
   labels:
     tier: app
 
+worker:
+  name: worker
+  labels:
+    tier: worker
+
+ingress:
+  host: foreman-prod.local
 fqdn: foreman.example.com
 
 expose:

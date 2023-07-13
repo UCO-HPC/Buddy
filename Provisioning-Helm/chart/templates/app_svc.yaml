@@ -7,8 +7,11 @@ metadata:
     tier: {{ .Values.app.labels.tier }}
   namespace: {{ .Release.Namespace }}
 spec:
+  type: NodePort
   ports:
     - port: {{ .Values.app.port }}
+      nodePort: 30432
+      name: http
   selector:
     app: {{ .Release.Namespace }}
     tier: {{ .Values.app.labels.tier }}

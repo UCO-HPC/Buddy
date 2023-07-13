@@ -30,3 +30,8 @@ spec:
         volumeMounts:
         - mountPath: "/data"
           name: {{ .Values.redis.name }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.redis.port }}
+          periodSeconds: 5
+          initialDelaySeconds: 1

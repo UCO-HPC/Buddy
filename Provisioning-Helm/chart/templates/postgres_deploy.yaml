@@ -45,3 +45,8 @@ spec:
         volumeMounts:
         - mountPath: "/var/lib/postgresql/data"
           name: {{ .Values.postgres.name }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.postgres.port }}
+          periodSeconds: 5
+          initialDelaySeconds: 1
