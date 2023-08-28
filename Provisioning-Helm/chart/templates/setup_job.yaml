@@ -3,28 +3,43 @@ kind: Job
 metadata:
   name: setup
   namespace: {{ .Release.Namespace }}
-  annotations:
-  #   # This is what defines this resource as a hook. Without this line, the
-  #   # job is considered part of the release.
-    # "helm.sh/hook": post-install
-    # "helm.sh/hook-weight": "-5"
-    # "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
 spec:
   completions: 1
   template:
     metadata:
       name: setup
     spec:
+      volumes:
+      - name: {{ .Values.postgres.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.postgres.name }}
       containers:
+      # - name: setup-db
+      #   image: {{ .Values.postgres.image }}
+      #   env:
+      #   - name: POSTGRES_USER
+      #     valueFrom:
+      #       secretKeyRef:
+      #         name: "db-user"
+      #         key: "username"
+      #   - name: POSTGRES_PASSWORD
+      #     valueFrom:
+      #       secretKeyRef:
+      #         name: "db-user-pass"
+      #         key: "password"
+      #   - name: POSTGRES_DATABASE
+      #     value: {{ .Values.postgres.db_name }}
+      #   - name: PGDATA
+      #     value: "/var/lib/postgresql/data/pgdata"
+      #   ports:
+      #   - containerPort: {{ .Values.setup.db.port }}
+      #   volumeMounts:
+      #   - mountPath: "/var/lib/postgresql/data"
+      #     name: {{ .Values.postgres.name }}
       - name: setup
         image: {{ .Values.app.image }}
-        args: 
-        - bundle
-        - exec
-        - rake
-        - db:create
-        - db:migrate
-        - db:seed
+        command: ["sleep"]
+        args: ["infinity"]
         env:
         - name: RAILS_ENV
           value: "production"
