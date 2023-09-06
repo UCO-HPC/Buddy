@@ -1,0 +1,22 @@
+annotations:
+  category: ApplicationServer
+  licenses: GPLv3
+apiVersion: v2
+appVersion: 3.7.0
+description: Foreman is a free open source project that gives you the power to easily automate repetitive tasks, quickly deploy applications, and proactively manage your servers life cycle, on-premises or in the cloud.
+home: https://theforeman.org/
+icon: https://theforeman.org/static/images/foremanhelmet.svg
+keywords:
+  - maas
+  - infrastructure-management
+  - puppet
+  - virtualization
+  - cloud
+  - config-management
+maintainers:
+  - name: CREIC, University of Central Oklahoma
+    url: https://github.com/UCO-HPC/Buddy/
+name: foreman
+sources:
+  - https://github.com/UCO-HPC/Buddy/tree/main/Provisioning-Helm
+version: 0.1.1

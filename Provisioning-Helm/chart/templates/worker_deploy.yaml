@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Release.Name }}
+  name: {{ .Values.worker.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  minReadySeconds: 10
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+      tier: {{ .Values.worker.labels.tier }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        tier: {{ .Values.worker.labels.tier }}
+      name: worker
+    spec:
+      containers:
+      - args:
+        - bundle
+        - exec
+        - rake
+        - dynflow:executor
+        env:
+        - name: RAILS_LOG_TO_STDOUT
+          value: "true"
+        - name: RAILS_ENV
+          value: {{ .Values.rails_env }}
+        - name: FOREMAN_FQDN
+          value: {{ .Values.fqdn }}
+        - name: FOREMAN_RAILS_CACHE_STORE_TYPE
+          value: redis
+        - name: FOREMAN_RAILS_CACHE_STORE_URLS
+          value: redis://$(REDIS_SERVICE_HOST):$(REDIS_SERVICE_PORT)/0
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              key: secret-key-base
+              name: secret-key-base
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: url
+              name: db-url
+        image: {{ .Values.app.image }}
+        imagePullPolicy: Always
+        name: worker
+        resources: {}
+        # This pod depends on the foreman controller being ready
+        # readinessProbe:
+        #   tcpSocket:
+        #     port: {{ .Values.app.port }}
+        #   periodSeconds: 5
+        #   initialDelaySeconds: 1
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

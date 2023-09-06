@@ -1,0 +1,3 @@
+postgres:
+  db_password: # DATABASE PASSWORD
+rails_secret: # RAILS SECRET
