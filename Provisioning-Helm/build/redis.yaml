@@ -1,0 +1,73 @@
+NAME: foreman
+LAST DEPLOYED: Thu Jun 22 13:37:57 2023
+NAMESPACE: default
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+HOOKS:
+MANIFEST:
+---
+# Source: foreman/templates/redis_pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: redis-cache-pvc
+  namespace: default
+  labels:
+    app: foreman
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# Source: foreman/templates/redis_svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cache-svc
+  namespace: default
+  labels:
+    app: foreman
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: foreman
+    tier: cache
+---
+# Source: foreman/templates/redis_deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cache-deployment
+  namespace: default
+  labels:
+    app: foreman
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: foreman
+      tier: cache
+  template:
+    metadata:
+      name: redis-cache
+      labels:
+        app: foreman
+        tier: cache
+    spec:
+      volumes:
+      - name: redis-cache-pv
+        persistentVolumeClaim:
+          claimName: redis-cache-pvc
+      containers:
+      - name: redis-cache
+        image: redis
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - mountPath: "/data"
+          name: redis-cache-pv
+
