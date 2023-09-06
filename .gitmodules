@@ -1,0 +1,8 @@
+[submodule "foreman-container/foreman"]
+	path = foreman-container/foreman
+	url = https://github.com/theforeman/foreman.git
+	branch = 3.7-stable
+[submodule "Foreman-Container/foreman"]
+	path = Foreman-Container/foreman
+	url = https://github.com/theforeman/foreman.git
+	branch = 3.7-stable

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.redis.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: {{ .Release.Name }}
+      tier: cache
+  template:
+    metadata:
+      name: {{ .Values.redis.name }}
+      labels:
+        app: {{ .Release.Name }}
+        tier: cache
+    spec:
+      volumes:
+      - name: {{ .Values.redis.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.redis.name }}
+      containers:
+      - name: {{ .Values.redis.name }}
+        image: {{ .Values.redis.image }}
+        ports:
+        - containerPort: {{ .Values.redis.port }}
+        volumeMounts:
+        - mountPath: "/data"
+          name: {{ .Values.redis.name }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.redis.port }}
+          periodSeconds: 5
+          initialDelaySeconds: 1

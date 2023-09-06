@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Release.Namespace }}
+    tier: {{ .Values.app.labels.tier }}
+  name: {{ .Values.app.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  minReadySeconds: 10
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Release.Namespace }}
+      tier: {{ .Values.app.labels.tier }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Namespace }}
+        tier: {{ .Values.app.labels.tier }}
+      name: {{ .Values.app.name }}
+    spec:
+      containers:
+      - args:
+        - bundle
+        - exec
+        - rails
+        - server
+        env:
+        - name: RAILS_LOG_TO_STDOUT
+          value: "true"
+        - name: RAILS_SERVE_STATIC_FILES
+          value: "true"
+        - name: RAILS_ENV
+          value: {{ .Values.rails_env }}
+        - name: FOREMAN_FQDN
+          value: {{ .Values.fqdn }}
+        - name: FOREMAN_RAILS_CACHE_STORE_TYPE
+          value: "redis"
+        - name: RAILS_MAX_THREADS
+          value: {{ .Values.app.rails_max_threads | quote}}
+        - name: FOREMAN_RAILS_CACHE_STORE_URLS
+          value: redis://$(REDIS_SERVICE_HOST):$(REDIS_SERVICE_PORT)/0
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: url
+              name: db-url
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              key: secret-key-base
+              name: secret-key-base
+        image: {{ .Values.app.image }}
+        imagePullPolicy: Always
+        name: {{ .Values.app.name }}
+        ports:
+        - containerPort: {{ .Values.app.port }}
+          protocol: TCP
+        resources: {}
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: {{ .Values.app.port }}
+        #   periodSeconds: 5
+        #   initialDelaySeconds: 1
+        # # This pod depends on postgres being available
+        # startupProbe:
+        #   tcpSocket:
+        #     port: {{ .Values.postgres.port }}
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 5
+      # dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

@@ -1,0 +1,46 @@
+setup:
+  db:
+    port: 5567
+
+redis:
+  port: 6379
+  name: redis
+  storageSize: 1Gi
+  image: redis
+  labels:
+    tier: cache
+
+postgres:
+  port: 5432
+  name: postgres
+  image: postgres:12
+  storageSize: 1Gi
+  db_name: foreman
+  db_username: foreman
+  labels:
+    tier: database
+
+app:
+  port: 3000
+  rails_max_threads: 5
+  image: quay.io/foreman/foreman:develop
+  name: foreman
+  labels:
+    tier: app
+
+worker:
+  name: worker
+  labels:
+    tier: worker
+
+ingress:
+  host: foreman-prod.local
+fqdn: foreman.example.com
+
+expose:
+  type: nodePort
+  nodePort:
+    name: foreman
+    ports:
+      http:
+        nodePort: 30345
